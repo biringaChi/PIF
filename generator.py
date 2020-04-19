@@ -7,19 +7,19 @@ class Generator(nn.Module):
         self.model = nn.Sequential(
             nn.ConvTranspose2d(100, 1024, kernel_size=(4, 4), stride=(1, 1), padding=(0, 0), bias=False),
             nn.BatchNorm2d(1024),
-            nn.ReLU(False),
+            nn.ReLU(inplace = True),
             nn.ConvTranspose2d(1024, 512, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False),
             nn.BatchNorm2d(512),
-            nn.ReLU(),
+            nn.ReLU(inplace = True),
             nn.ConvTranspose2d(512, 256, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False),
             nn.BatchNorm2d(256),
-            nn.ReLU(),
+            nn.ReLU(inplace = True),
             nn.ConvTranspose2d(256, 128, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False),
             nn.BatchNorm2d(128),
-            nn.ReLU(),
+            nn.ReLU(inplace = True),
             nn.ConvTranspose2d(128, 64, kernel_size=(4, 4), stride=(2, 2), padding=(1, 1), bias=False),
             nn.BatchNorm2d(64),
-            nn.ReLU(),
+            nn.ReLU(inplace = True),
             nn.ConvTranspose2d(64, 3, 4, 2, 1, bias=False),
             nn.Tanh()
             )
@@ -39,4 +39,5 @@ def weights_init(m):
 if __name__ == '__main__':
     gen = Generator()
     gen.apply(weights_init)
+    print(gen)
 
