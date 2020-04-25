@@ -1,10 +1,9 @@
+__author__ = 'biringaChidera'
+
 import torch
-import numpy as np
 import torch.nn as nn
-import torchvision.utils as vutils
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
 
 class DataPrep():
     def __init__(self, directory, batch_size):
@@ -28,4 +27,4 @@ if __name__ == '__main__':
     directory, batch_size = "data", 128
     training_data = DataPrep(directory, 128)
     training_batch = next(iter(training_data.training_data_prep()))
-    print(training_batch)
+    #print(training_batch)
