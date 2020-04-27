@@ -1,30 +1,65 @@
 __author__ = 'biringaChidera'
 
+import os
 import torch
-import torchvision.datasets as dset
-import torchvision.transforms as transforms
+import cv2
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 
 
-class DataPrep():
-    def __init__(self, directory, batch_size):
-        self.directory = directory
-        self.batch_size = batch_size
+class PlanetEarthDataset(Dataset):
+    def __init__(self, root_directory, transform=None):
+        self.root_directory = root_directory
+        self.transform = transform
 
-    def training_data_prep(self):
-        image_size = 50
-        dataset = dset.ImageFolder(root=self.directory,
-            transform=transforms.Compose([
-                transforms.Resize(image_size),
-                transforms.CenterCrop(image_size),
-                transforms.ToTensor(),
-                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                ]))
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
-        return dataloader
+    def __len__(self):
+        return len(self.root_directory)
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+        img_name = os.path.join("data", "planet_earth")
+        image = cv2.imread(img_name)
+        sample = {'image': image}
+        if self.transform:
+            sample = self.transform(sample)
+        return sample
+
+
+class Rescale(object):
+    def __init__(self, output_size):
+        assert isinstance(output_size, (int, tuple))
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        image = sample['image']
+        h, w = image.shape[:2]
+        if isinstance(self.output_size, int):
+            if h > w:
+                new_h, new_w = self.output_size * h / w, self.output_size
+            else:
+                new_h, new_w = self.output_size, self.output_size * w / h
+        else:
+            new_h, new_w = self.output_size
+        new_h, new_w = int(new_h), int(new_w)
+        img = transform.resize(image, (new_h, new_w))
+        return {'image': img}
+
+
+class ToTensor(object):
+    def __call__(self, sample):
+        image = sample['image']
+        image = image.transpose((2, 0, 1))
+        return torch.from_numpy(image)
 
 
 if __name__ == '__main__':
-    directory, batch_size = "data", 128
-    training_data = DataPrep(directory, 128)
-    training_batch = next(iter(training_data.training_data_prep()))
-#    print(training_batch)
+    transformed_dataset = PlanetEarthDataset(root_directory='data/planet_earth',
+        transform=transforms.Compose([
+            Rescale(256),
+            ToTensor()
+            ]))
+
+    dataloader = DataLoader(transformed_dataset, batch_size=4,
+        shuffle=True, num_workers=2)
+        # print(next(iter(dataloader)))
