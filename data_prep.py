@@ -1,4 +1,5 @@
-__author__ = 'biringaChidera'
+# Reference
+# https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
 
 import os
 import torch
