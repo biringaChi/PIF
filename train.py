@@ -118,7 +118,7 @@ for epoch in range(num_epochs):
        
         dis_out = netD(output).view(-1)
        
-        errG = loss(dis_out, label)  ##where loss is applied
+        errG = loss(dis_out, label)  ## where loss is applied
        
         errG.backward()
         D_gen = dis_out.mean().item()
