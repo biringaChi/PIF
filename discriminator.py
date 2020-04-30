@@ -5,8 +5,9 @@ import torch
 import torch.nn as nn
 
 class Discriminator(nn.Module):
-    def __init__(self, nc, ndf):
+    def __init__(self, ngpu, nc, ndf):
         super(Discriminator, self).__init__()
+        self.ngpu = ngpu
         self.nc = nc
         self.ndf = ndf
 
@@ -33,7 +34,7 @@ class Discriminator(nn.Module):
         return self.model(img1 + img2)
 
 if __name__ == '__main__':
-    dis = Discriminator(3, 10) #blablablabla
+    dis = Discriminator(0, 3, 10) #blablablabla
     print(dis)
 
 

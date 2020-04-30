@@ -4,8 +4,9 @@ import torch.nn as nn
 
 
 class Generator(nn.Module):
-    def __init__(self, nc, ngf):
+    def __init__(self, ngpu, nc, ngf):
         super(Generator, self).__init__()
+        self.ngpu = ngpu
         self.nc = nc
         self.ngf = ngf
 
@@ -35,5 +36,5 @@ class Generator(nn.Module):
 
 
 if __name__ == '__main__':
-    gen = Generator(3, 32)
+    gen = Generator(0, 3, 32)
 #   print(gen)
