@@ -40,4 +40,4 @@ def FrameCapture(path):
 if __name__ == '__main__': 
 
 	# Calling the function 
-    FrameCapture("C:\\Users\\rjsem\\Desktop\\Popeye\\Popeye.mp4") 
+    FrameCapture("PlanetEarth\\PlanetEarth.mp4") 

@@ -8,9 +8,9 @@ import cv2
 import matplotlib.pyplot as plt
 from data_prepocessing.ImageToArray import ImageToArrayColor
 
-ini = 1000
-lst = 3000#10979
-path = "data_prepocessing\\Popeye"
+ini = 0
+lst = 3274#10979
+path = "data_prepocessing\\PlanetEarth"
 diff = []
 
 img = ImageToArrayColor(os.path.join(path, "frame" + str(ini) + ".jpg"))
