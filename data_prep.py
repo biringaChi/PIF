@@ -1,3 +1,5 @@
+__author__ = 'biringaChidera'
+__email__ = "biringaChidera@gmail.com"
 
 import os
 import glob
