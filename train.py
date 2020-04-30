@@ -2,8 +2,6 @@ __author__ = 'JosueCom'
 __date__ = '4/30/2020'
 
 from __future__ import print_function
-import argparse
-import os
 import random
 import torch
 import torch.nn as nn
@@ -45,8 +43,6 @@ dataloader = DataLoader(dataset, batch_size=batch_size,
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
-
-
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -54,7 +50,6 @@ def weights_init(m):
     elif classname.find('BatchNorm') != -1:
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
-
 
 ## generator
 netG = Generator(ngpu, nc, ngf).to(device)
