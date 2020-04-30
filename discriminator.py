@@ -1,5 +1,6 @@
 __author__ = 'JosueCom'
 __date__ = '4/21/2020'
+__email__ = "josue.n.rivera@outlook.com"
 
 import torch
 import torch.nn as nn

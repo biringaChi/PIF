@@ -1,5 +1,6 @@
 __author__ = 'JosueCom'
 __date__ = '4/30/2020'
+__email__ = "josue.n.rivera@outlook.com"
 
 from __future__ import print_function
 import random
