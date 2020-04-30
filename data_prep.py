@@ -13,6 +13,7 @@ class PIFDataset(Dataset):
         self.root_directory = root_directory
         self.transform = transform
 
+
     def __len__(self):
         size = []
         for filename in os.listdir(self.root_directory):
@@ -49,7 +50,7 @@ class ToTensor(object):
     def __call__(self, sample):
         for image_name, image_value in sample.items():
             image = image_value.transpose((2, 0, 1))
-        return torch.from_numpy(image_value)
+        return torch.from_numpy(image)
 
 
 if __name__ == '__main__':
