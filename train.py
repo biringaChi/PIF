@@ -16,7 +16,7 @@ from discriminator import Discriminator
 
 dataroot = "data_prepocessing/Popeye2"
 
-workers = 2
+workers = 2 #threads
 batch_size = 128
 image_size = 500
 nc = 3

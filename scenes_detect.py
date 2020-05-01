@@ -33,8 +33,10 @@ for i in range(ini + 1, lst + 1):
 
 #print(diff)
 
-plt.plot(list(range(len(diff))), diff, "b-")
+plt.plot(list(range(len(diff))), diff, "b.")
 plt.ylabel('difference')
 plt.xlabel('scene')
 plt.show()
 
+
+### store diff array in file for use in preprocessing
