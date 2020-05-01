@@ -2,9 +2,10 @@ __author__ = 'biringaChidera'
 __email__ = "biringaChidera@gmail.com"
 
 import os
+import cv2
+import numpy as np
 import glob
 import torch
-import cv2
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
@@ -30,6 +31,7 @@ class PIFDataset(Dataset):
             idx = idx.tolist()
         prev = 0
         curr = 1
+        nex = 2
         images = []
         image_path = os.path.join(self.root_directory, '*g')
         image_files = glob.glob(image_path)
@@ -38,21 +40,23 @@ class PIFDataset(Dataset):
             images.append(image)
         curr = images[curr]
         prev = images[prev]
-        sample = {"previous_image" : prev, "current_image" : curr}
+        nex = images[nex]
+        sample = {"previous_image": prev, "current_image": curr, "next_image": nex}
         curr += 1
         prev += 1
+        nex += 1
         if self.transform:
             sample = self.transform(sample)
         return sample
 
-class Rescale(object): # needs to be implements for all images in sample
-    def __init__(self, output_size, transform=None):
+
+class Rescale(object):
+    def __init__(self, output_size):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
-        self.transform = transform
 
     def __call__(self, sample):
-     for image_name, image_value in sample.items():
+        for image_name, image_value in sample.items():
             h, w = image_value.shape[:2]
             if isinstance(self.output_size, int):
                 if h > w:
@@ -62,11 +66,33 @@ class Rescale(object): # needs to be implements for all images in sample
             else:
                 new_h, new_w = self.output_size
             new_h, new_w = int(new_h), int(new_w)
-            rescaled_image = transform.resize(image_value, (new_h, new_w))
-            return {"prev" : rescaled_image[0], "curr" : rescaled_image[1]} # you are returning for all images, I can elaborate on it
+            image = cv2.resize(image_value, (new_h, new_w))
+            sample[image_name] = image
+        return sample
+
+
+class RandomCrop(object):
+    def __init__(self, output_size):
+        assert isinstance(output_size, (int, tuple))
+        if isinstance(output_size, int):
+            self.output_size = (output_size, output_size)
+        else:
+            assert len(output_size) == 2
+            self.output_size = output_size
+
+    def __call__(self, sample):
+        for image_name, image_value in sample.items():
+            h, w = image_value.shape[:2]
+            new_h, new_w = self.output_size
+            top = np.random.randint(0, h - new_h)
+            left = np.random.randint(0, w - new_w)
+            image = image_value[top: top + new_h, left: left + new_w]
+            sample[image_name] = image
+        return sample
+
 
 class ToTensor(object):
-    def __call__(self, sample): # you are only return one image and it is the last one
+    def __call__(self, sample):
         for image_name, image_value in sample.items():
             image = image_value.transpose((2, 0, 1))
             sample[image_name] = torch.from_numpy(image)
@@ -74,12 +100,12 @@ class ToTensor(object):
 
 
 if __name__ == '__main__':
-    transformed_dataset = PIFDataset(root_directory='scratch/1',
+    transformed_dataset = PIFDataset(
+        root_directory='scratch/1',
         transform=transforms.Compose([
             Rescale(256),
-            ToTensor()
-            ]))
+            RandomCrop(224),
+            ToTensor()]))
 
-    dataloader = DataLoader(transformed_dataset, batch_size=4,
-        shuffle=True, num_workers=2)
-    print(next(iter(dataloader)))
+    dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True)
+#    print(next(iter(dataloader)))
