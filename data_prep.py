@@ -45,7 +45,7 @@ class PIFDataset(Dataset):
             sample = self.transform(sample)
         return sample
 
-class Rescale(object): # needs to be implements for image in sample
+class Rescale(object): # needs to be implements for all images in sample
     def __init__(self, output_size, transform=None):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
@@ -63,10 +63,10 @@ class Rescale(object): # needs to be implements for image in sample
                 new_h, new_w = self.output_size
             new_h, new_w = int(new_h), int(new_w)
             rescaled_image = transform.resize(image_value, (new_h, new_w))
-            return {"prev" : rescaled_image[0], "curr" : rescaled_image[1]}
+            return {"prev" : rescaled_image[0], "curr" : rescaled_image[1]} # you are returning for all images, I can elaborate on it
 
 class ToTensor(object):
-    def __call__(self, sample):
+    def __call__(self, sample): # you are only return one image and it is the last one
         for image_name, image_value in sample.items():
             image = image_value.transpose((2, 0, 1))
         return torch.from_numpy(image)
