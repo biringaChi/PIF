@@ -69,7 +69,8 @@ class ToTensor(object):
     def __call__(self, sample): # you are only return one image and it is the last one
         for image_name, image_value in sample.items():
             image = image_value.transpose((2, 0, 1))
-        return torch.from_numpy(image)
+            sample[image_name] = torch.from_numpy(image)
+        return sample
 
 
 if __name__ == '__main__':
