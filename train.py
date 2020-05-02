@@ -88,11 +88,11 @@ for epoch in range(num_epochs):
         cut = (int) lf_to_rg_ratio * b_size
        	
        	######### train discriminator
-        output = netG(data["prev"], data["next"])
+        gen_out = netG(data["prev"], data["next"])
 
         ## Train with correct output on the left side
         label = torch.full((cut,), true_left, device=device)
-        dis_out = netD(data["curr"][:cut].detach(), output[:cut]).view(-1)
+        dis_out = netD(data["curr"][:cut].detach(), gen_out[:cut]).view(-1)
 
         errD_left = loss(dis_out, label)
         errD_left.backward()
@@ -100,7 +100,7 @@ for epoch in range(num_epochs):
         
         ## Train with correct output on the right side
         label = torch.full((b_size - cut,), true_right, device=device)
-        dis_out = netD(output[cut:], data["curr"][cut:].detach()).view(-1)
+        dis_out = netD(gen_out[cut:], data["curr"][cut:].detach()).view(-1)
 
         errD_right = loss(dis_out, label)
         errD_right.backward()
@@ -111,12 +111,12 @@ for epoch in range(num_epochs):
         optimizerD.step()
 
        	
-       	######### train generator 
+       	######### train generator (check again)
         netG.zero_grad()
-        label = torch.full((cut,), true_left, device=device)
-        label = torch.cat((label, torch.full((cut,), true_right, device=device)), dim=1);
+        label = torch.full((cut,), true_right, device=device)
+        label = torch.cat((label, torch.full((cut,), true_left, device=device)), dim=1);
        
-        dis_out = netD(output).view(-1)
+        dis_out = netD(gen_out).view(-1)
        
         errG = loss(dis_out, label)  ## where loss is applied
        
