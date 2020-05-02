@@ -12,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
 class PIFDataset(Dataset):
-    def __init__(self, root_directory, diff, transform=None, groups = OrderedDict(), count = 0, buff = [], threshold = 90):
+    def __init__(self, root_directory, diff, transform=None, groups = OrderedDict(), count = 0, buff = [], threshold = False):
         self.root_directory = root_directory
         self.transform = transform
         self.groups = groups
@@ -31,7 +31,6 @@ class PIFDataset(Dataset):
         for key, values in list(self.groups.items()):
             if len(values) < 3:
                 del self.groups[key]
-
 
     def __len__(self):
         size = []
@@ -129,5 +128,4 @@ if __name__ == '__main__':
             ]))
 
     dataloader = DataLoader(transformed_dataset, batch_size=1, shuffle=True)
-    print(next(iter(dataloader)))
-    #print(buff)
+    #print(next(iter(dataloader)))
