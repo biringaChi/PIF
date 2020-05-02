@@ -4,13 +4,14 @@ __email__ = "josue.n.rivera@outlook.com"
 
 import numpy as np
 import os
+import pickle
 import cv2
 import matplotlib.pyplot as plt
 from data_prepocessing.ImageToArray import ImageToArrayColor
 
 ini = 0
 lst = 3274#10979
-path = "data_prepocessing\\PlanetEarth"
+path = "data/planet_earth"
 diff = []
 
 img = ImageToArrayColor(os.path.join(path, "frame" + str(ini) + ".jpg"))
@@ -31,12 +32,14 @@ for i in range(ini + 1, lst + 1):
 	if(i%200 == 0):
 		print(">" + str(i))
 
-#print(diff)
+print(diff)
 
 plt.plot(list(range(len(diff))), diff, "b.")
 plt.ylabel('difference')
 plt.xlabel('scene')
 plt.show()
 
-
-### store diff array in file for use in preprocessing
+# store diff array in file for use in preprocessing
+diff_pickle = open("diff.pickle","wb")
+pickle.dump(diff, diff_pickle)
+diff_pickle.close()

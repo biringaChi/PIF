@@ -1,18 +1,36 @@
-__author__ = 'biringaChidera'
-__email__ = "biringaChidera@gmail.com"
+__author__ = 'biringaChi'
+__email__ = "biringachidera@gmail.com"
 
 import os
+import pickle
+from collections import OrderedDict
+import cv2
+import numpy as np
 import glob
 import torch
-import cv2
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
-
 class PIFDataset(Dataset):
-    def __init__(self, root_directory, transform=None):
+    def __init__(self, root_directory, diff, transform=None, groups = OrderedDict(), count = 0, buff = [], threshold = False):
         self.root_directory = root_directory
         self.transform = transform
+        self.groups = groups
+        self.count = count
+        self.buff = buff
+        self.diff = diff
+        self.threshold = threshold # threshold to be set
+
+        for difference in self.diff:
+            if difference <= self.threshold:
+                self.groups[self.count] = self.buff
+                self.buff = []
+                self.count += 1
+            self.buff.append(difference)
+
+        for key, values in list(self.groups.items()):
+            if len(values) < 3:
+                del self.groups[key]
 
     def __len__(self):
         size = []
@@ -23,13 +41,14 @@ class PIFDataset(Dataset):
                 size.append(img)
             else:
                 continue
-        return len(size) - 2
+        return len(size) - 3
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
         prev = 0
         curr = 1
+        nex = 2
         images = []
         image_path = os.path.join(self.root_directory, '*g')
         image_files = glob.glob(image_path)
@@ -38,21 +57,23 @@ class PIFDataset(Dataset):
             images.append(image)
         curr = images[curr]
         prev = images[prev]
-        sample = {"previous_image" : prev, "current_image" : curr}
+        nex = images[nex]
+        sample = {"previous_image": prev, "current_image": curr, "next_image": nex}
         curr += 1
         prev += 1
+        nex += 1
         if self.transform:
             sample = self.transform(sample)
         return sample
 
-class Rescale(object): # needs to be implements for all images in sample
-    def __init__(self, output_size, transform=None):
+
+class Rescale(object):
+    def __init__(self, output_size):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
-        self.transform = transform
 
     def __call__(self, sample):
-     for image_name, image_value in sample.items():
+        for image_name, image_value in sample.items():
             h, w = image_value.shape[:2]
             if isinstance(self.output_size, int):
                 if h > w:
@@ -62,11 +83,33 @@ class Rescale(object): # needs to be implements for all images in sample
             else:
                 new_h, new_w = self.output_size
             new_h, new_w = int(new_h), int(new_w)
-            rescaled_image = transform.resize(image_value, (new_h, new_w))
-            return {"prev" : rescaled_image[0], "curr" : rescaled_image[1]} # you are returning for all images, I can elaborate on it
+            image = cv2.resize(image_value, (new_h, new_w))
+            sample[image_name] = image
+        return sample
+
+
+class RandomCrop(object):
+    def __init__(self, output_size):
+        assert isinstance(output_size, (int, tuple))
+        if isinstance(output_size, int):
+            self.output_size = (output_size, output_size)
+        else:
+            assert len(output_size) == 2
+            self.output_size = output_size
+
+    def __call__(self, sample):
+        for image_name, image_value in sample.items():
+            h, w = image_value.shape[:2]
+            new_h, new_w = self.output_size
+            top = np.random.randint(0, h - new_h)
+            left = np.random.randint(0, w - new_w)
+            image = image_value[top: top + new_h, left: left + new_w]
+            sample[image_name] = image
+        return sample
+
 
 class ToTensor(object):
-    def __call__(self, sample): # you are only return one image and it is the last one
+    def __call__(self, sample):
         for image_name, image_value in sample.items():
             image = image_value.transpose((2, 0, 1))
             sample[image_name] = torch.from_numpy(image)
@@ -74,12 +117,15 @@ class ToTensor(object):
 
 
 if __name__ == '__main__':
-    transformed_dataset = PIFDataset(root_directory='scratch/1',
+    diff_pickle = open("diff.pickle","rb")
+    transformed_dataset = PIFDataset(
+        root_directory='scratch/1',
+        diff = pickle.load(diff_pickle),
         transform=transforms.Compose([
             Rescale(256),
+            RandomCrop(224),
             ToTensor()
             ]))
 
-    dataloader = DataLoader(transformed_dataset, batch_size=4,
-        shuffle=True, num_workers=2)
-    print(next(iter(dataloader)))
+    dataloader = DataLoader(transformed_dataset, batch_size=1, shuffle=True)
+    #print(next(iter(dataloader)))
