@@ -32,7 +32,7 @@ for i in range(ini + 1, lst + 1):
 	if(i%200 == 0):
 		print(">" + str(i))
 
-print(diff)
+#print(diff)
 
 plt.plot(list(range(len(diff))), diff, "b.")
 plt.ylabel('difference')

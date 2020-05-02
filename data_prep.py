@@ -12,12 +12,12 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
 class PIFDataset(Dataset):
-    def __init__(self, root_directory, diff, transform=None, groups = OrderedDict(), count = 0, buff = [], threshold = False):
+    def __init__(self, root_directory, diff, transform=None, threshold = 5):
         self.root_directory = root_directory
         self.transform = transform
-        self.groups = groups
-        self.count = count
-        self.buff = buff
+        self.groups = OrderedDict()
+        self.count = 0
+        self.buff = []
         self.diff = diff
         self.threshold = threshold # threshold to be set
 
@@ -28,7 +28,7 @@ class PIFDataset(Dataset):
                 self.count += 1
             self.buff.append(difference)
 
-        for key, values in list(self.groups.items()):
+        for key, values in self.groups.items():
             if len(values) < 3:
                 del self.groups[key]
 

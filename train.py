@@ -5,6 +5,7 @@ __email__ = "josue.n.rivera@outlook.com"
 from __future__ import print_function
 import random
 import torch
+import pickle
 import torch.nn as nn
 import data_prep as prep
 from torchvision import transforms
@@ -16,7 +17,6 @@ from discriminator import Discriminator
 
 dataroot = "data_prepocessing/Popeye2"
 
-workers = 2 #threads
 batch_size = 128
 image_size = 500
 nc = 3
@@ -33,14 +33,16 @@ lf_to_rg_ratio = 0.5
 G_losses = []
 D_losses = []
 
+diff_pickle = open("diff.pickle","rb")
 dataset = PIFDataset(root_directory=dataroot,
+        diff = pickle.load(diff_pickle),
         transform=transforms.Compose([
             prep.Rescale(image_size),
             prep.ToTensor()
             ]))
 
 dataloader = DataLoader(dataset, batch_size=batch_size,
-        shuffle=True, num_workers=workers)
+        shuffle=True)
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
