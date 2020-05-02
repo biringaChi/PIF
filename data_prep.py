@@ -33,15 +33,11 @@ class PIFDataset(Dataset):
                 del self.groups[key]
 
     def __len__(self):
-        size = []
-        for filename in os.listdir(self.root_directory):
-            if filename.endswith(".jpg"):
-                path = os.path.join(self.root_directory, filename)
-                img = cv2.imread(path)
-                size.append(img)
-            else:
-                continue
-        return len(size) - 3
+        sizes = []
+        for key, value in self.groups.items(): 
+            sizes.append(len(value) - 2)
+
+        return np.sum(sizes)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
