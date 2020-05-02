@@ -1,7 +1,9 @@
-__author__ = 'biringaChidera'
-__email__ = "biringaChidera@gmail.com"
+__author__ = 'biringaChi'
+__email__ = "biringachidera@gmail.com"
 
 import os
+import pickle
+from collections import OrderedDict
 import cv2
 import numpy as np
 import glob
@@ -9,11 +11,27 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 
-
 class PIFDataset(Dataset):
-    def __init__(self, root_directory, transform=None):
+    def __init__(self, root_directory, diff, transform=None, groups = OrderedDict(), count = 0, buff = [], threshold = 90):
         self.root_directory = root_directory
         self.transform = transform
+        self.groups = groups
+        self.count = count
+        self.buff = buff
+        self.diff = diff
+        self.threshold = threshold # threshold to be set
+
+        for difference in self.diff:
+            if difference <= self.threshold:
+                self.groups[self.count] = self.buff
+                self.buff = []
+                self.count += 1
+            self.buff.append(difference)
+
+        for key, values in list(self.groups.items()):
+            if len(values) < 3:
+                del self.groups[key]
+
 
     def __len__(self):
         size = []
@@ -24,7 +42,7 @@ class PIFDataset(Dataset):
                 size.append(img)
             else:
                 continue
-        return len(size) - 2
+        return len(size) - 3
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
@@ -100,12 +118,16 @@ class ToTensor(object):
 
 
 if __name__ == '__main__':
+    diff_pickle = open("diff.pickle","rb")
     transformed_dataset = PIFDataset(
         root_directory='scratch/1',
+        diff = pickle.load(diff_pickle),
         transform=transforms.Compose([
             Rescale(256),
             RandomCrop(224),
-            ToTensor()]))
+            ToTensor()
+            ]))
 
-    dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True)
-#    print(next(iter(dataloader)))
+    dataloader = DataLoader(transformed_dataset, batch_size=1, shuffle=True)
+    print(next(iter(dataloader)))
+    #print(buff)
