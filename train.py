@@ -81,14 +81,14 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 loss = nn.BCELoss()
 
 for epoch in range(num_epochs):
-   
+
     for i, data in enumerate(dataloader, 0):
 
         netD.zero_grad()
         b_size = data["prev"].size(0)
 
         cut = (int) lf_to_rg_ratio * b_size
-       	
+
        	######### train discriminator
         gen_out = netG(data["prev"], data["next"])
 
@@ -99,7 +99,7 @@ for epoch in range(num_epochs):
         errD_left = loss(dis_out, label)
         errD_left.backward()
         D_left = dis_out.mean().item()
-        
+
         ## Train with correct output on the right side
         label = torch.full((b_size - cut,), true_right, device=device)
         dis_out = netD(gen_out[cut:], data["curr"][cut:].detach()).view(-1)
@@ -112,19 +112,19 @@ for epoch in range(num_epochs):
 
         optimizerD.step()
 
-       	
+
        	######### train generator (check again)
         netG.zero_grad()
         label = torch.full((cut,), true_right, device=device)
         label = torch.cat((label, torch.full((cut,), true_left, device=device)), dim=1);
-       
+
         dis_out = netD(gen_out).view(-1)
-       
+
         errG = loss(dis_out, label)  ## where loss is applied
-       
+
         errG.backward()
         D_gen = dis_out.mean().item()
-       
+
         optimizerG.step()
 
         #### stats
@@ -138,3 +138,13 @@ for epoch in range(num_epochs):
 
 torch.save(netG.state_dict(), "generator.bin")
 torch.save(netD.state_dict(), "discriminator.bin")
+
+# store network stats for testing
+G = open("G_losses.pickle","wb")
+pickle.dump(G_losses, G)
+G.close()
+
+D = open("D_losses.pickle","wb")
+pickle.dump(D_losses, D)
+D.close()
+
