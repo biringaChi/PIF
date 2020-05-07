@@ -15,10 +15,10 @@ import numpy as np
 from generator import Generator
 from discriminator import Discriminator
 
-dataroot = "data_prepocessing/Popeye2"
+dataroot = 'data_prepocessing/PlanetEarth'
 
 batch_size = 128
-image_size = 500
+#image_size = 500
 nc = 3
 nz = 100
 ngf = 64
@@ -33,13 +33,15 @@ lf_to_rg_ratio = 0.5
 G_losses = []
 D_losses = []
 
-diff_pickle = open("diff.pickle","rb")
-dataset = PIFDataset(root_directory=dataroot,
-        diff = pickle.load(diff_pickle),
-        transform=transforms.Compose([
-            prep.Rescale(image_size),
-            prep.ToTensor()
-            ]))
+diff_pickle = open("planet_earth_diff.pickle","rb")
+
+transformed_dataset = PIFDataset(
+    path=dataroot,
+    diff = pickle.load(diff_pickle),
+    transform=transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        ]))
 
 dataloader = DataLoader(dataset, batch_size=batch_size,
         shuffle=True)
@@ -80,7 +82,7 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
 loss = nn.BCELoss()
 
-for epoch in range(num_epochs):
+for epoch in range(1):
 
     for i, data in enumerate(dataloader, 0):
 

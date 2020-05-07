@@ -57,8 +57,7 @@ class PIFDataset(Dataset):
             idx = idx.tolist()
 
         for key, values in self.groups.items():
-            len_g = len(values)
-            temp = idx - len_g
+            temp = idx - len(values)
 
             if(temp > 0):
                 idx = temp
