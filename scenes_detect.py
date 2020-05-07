@@ -11,7 +11,7 @@ from data_prepocessing.ImageToArray import ImageToArrayColor
 
 ini = 0
 lst = 3274#10979
-path = "data/planet_earth"
+path = "data_prepocessing/PlanetEarth"
 diff = []
 
 img = ImageToArrayColor(os.path.join(path, "frame" + str(ini) + ".jpg"))
@@ -40,6 +40,6 @@ plt.xlabel('scene')
 plt.show()
 
 # store diff array in file for use in preprocessing
-diff_pickle = open("diff.pickle","wb")
+diff_pickle = open("planet_earth_diff.pickle","wb")
 pickle.dump(diff, diff_pickle)
 diff_pickle.close()
