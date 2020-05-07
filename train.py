@@ -35,7 +35,7 @@ D_losses = []
 
 diff_pickle = open("planet_earth_diff.pickle","rb")
 
-transformed_dataset = PIFDataset(
+dataset = PIFDataset(
     path=dataroot,
     diff = pickle.load(diff_pickle),
     transform=transforms.Compose([
