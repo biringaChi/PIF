@@ -34,7 +34,7 @@ dataset = prep.PIFDataset(
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ]))
 
-dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=4, shuffle=True)
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
