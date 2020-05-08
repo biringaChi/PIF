@@ -9,7 +9,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from generator import Generator
 from discriminator import Discriminator
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import cv2
 
@@ -20,8 +20,9 @@ __email__ = "josue.n.rivera@outlook.com"
 
 #image_size = 500
 nc = 3
-ngf = 64
+ngf = 25
 batch_size = 2
+image_size = 500
 beta1 = 0.5
 ngpu = torch.cuda.device_count()
 lf_to_rg_ratio = 0.5
@@ -33,11 +34,13 @@ dataset = prep.PIFDataset(
     path='data_prepocessing/PlanetEarth',
     diff = pickle.load(diff_pickle),
     transform=transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Resize(image_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ]))
 
-dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 print("Done loading dataset")
 
@@ -55,13 +58,14 @@ def weights_init(m):
 ## generator
 netG = Generator(ngpu, nc, ngf).to(device)
 
-if (device.type == 'cuda') and (ngpu > 1):
-    netG = nn.DataParallel(netG, list(range(ngpu)))
+"""if (device.type == 'cuda') and (ngpu > 1):
+    netG = nn.DataParallel(netG, list(range(ngpu)))"""
 
 netG.apply(weights_init)
 
 print("running model")
 batch = next(iter(dataloader))
+torch.cuda.empty_cache()
 out = netG(batch["prev"].to(device), batch["next"].to(device))
 print("done running model")
 

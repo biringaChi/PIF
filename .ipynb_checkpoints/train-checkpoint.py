@@ -1,32 +1,35 @@
-__author__ = 'JosueCom'
-__date__ = '4/30/2020'
-__email__ = "josue.n.rivera@outlook.com"
-
 from __future__ import print_function
 import random
 import torch
 import pickle
 import torch.nn as nn
 import data_prep as prep
-from torchvision import transforms
+from torchvision import transforms, utils
 import torch.nn.parallel
 import torch.optim as optim
 import numpy as np
 from generator import Generator
 from discriminator import Discriminator
+from torch.utils.data import DataLoader
+
+
+__author__ = 'JosueCom'
+__date__ = '4/30/2020'
+__email__ = "josue.n.rivera@outlook.com"
+
 
 dataroot = 'data_prepocessing/PlanetEarth'
 
-batch_size = 20
-#image_size = 500
+batch_size = 4
+image_size = 500
 nc = 3
 nz = 100
-ngf = 64
-ndf = 64
-num_epochs = 5
+ngf = 25
+ndf = 25
+num_epochs = 1
 lr = 0.0002
 beta1 = 0.5
-ngpu = 1
+ngpu = torch.cuda.device_count()
 lf_to_rg_ratio = 0.5
 
 #stats
@@ -35,16 +38,20 @@ D_losses = []
 
 diff_pickle = open("planet_earth_diff.pickle","rb")
 
+print("> loading dataset")
 dataset = prep.PIFDataset(
-    path=dataroot,
+    path='data_prepocessing/PlanetEarth',
     diff = pickle.load(diff_pickle),
     transform=transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Resize(image_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ]))
 
-dataloader = DataLoader(dataset, batch_size=batch_size,
-        shuffle=True)
+dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+print("Done loading dataset")
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
@@ -57,20 +64,24 @@ def weights_init(m):
         nn.init.constant_(m.bias.data, 0)
 
 ## generator
+print("> loading generator")
 netG = Generator(ngpu, nc, ngf).to(device)
 
-if (device.type == 'cuda') and (ngpu > 1):
-    netG = nn.DataParallel(netG, list(range(ngpu)))
+"""if (device.type == 'cuda') and (ngpu > 1):
+    netG = nn.DataParallel(netG, list(range(ngpu)))"""
 
 netG.apply(weights_init)
+print("Done loading generator")
 
+print("> loading discriminator")
 ## discriminator
 netD = Discriminator(ngpu, nc, ndf).to(device)
 
-if (device.type == 'cuda') and (ngpu > 1):
-    netD = nn.DataParallel(netD, list(range(ngpu)))
+"""if (device.type == 'cuda') and (ngpu > 1):
+    netD = nn.DataParallel(netD, list(range(ngpu)))"""
 
 netD.apply(weights_init)
+print("Done loading discriminator")
 
 # which of the two input is the real one for the discriminator
 true_left = 0
@@ -81,33 +92,35 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
 
 loss = nn.BCELoss()
-
-for epoch in range(1):
+print("> training")
+torch.cuda.empty_cache()
+for epoch in range(num_epochs):
 
     for i, data in enumerate(dataloader, 0):
 
         netD.zero_grad()
         b_size = data["prev"].size(0)
 
-        cut = (int) lf_to_rg_ratio * b_size
-
        	######### train discriminator
-        gen_out = netG(data["prev"], data["next"])
-
+        gen_out = netG(data["prev"].to(device), data["next"].to(device))
+        torch.cuda.empty_cache()
+        
         ## Train with correct output on the left side
-        label = torch.full((cut,), true_left, device=device)
-        dis_out = netD(data["curr"][:cut].detach(), gen_out[:cut]).view(-1)
+        label = torch.full((b_size,), true_left, device=device, dtype=torch.float32)
+        dis_out = netD(data["curr"].to(device), gen_out).view(-1)
+        torch.cuda.empty_cache()
 
         errD_left = loss(dis_out, label)
-        errD_left.backward()
+        errD_left.backward(retain_graph=True)
         D_left = dis_out.mean().item()
 
         ## Train with correct output on the right side
-        label = torch.full((b_size - cut,), true_right, device=device)
-        dis_out = netD(gen_out[cut:], data["curr"][cut:].detach()).view(-1)
+        label.fill_(true_right)
+        dis_out = netD(gen_out, data["curr"].to(device)).view(-1)
+        torch.cuda.empty_cache()
 
         errD_right = loss(dis_out, label)
-        errD_right.backward()
+        errD_right.backward(retain_graph=True)
         D_right = dis_out.mean().item()
 
         errD = errD_left + errD_right
@@ -117,10 +130,13 @@ for epoch in range(1):
 
        	######### train generator (check again)
         netG.zero_grad()
-        label = torch.full((cut,), true_right, device=device)
-        label = torch.cat((label, torch.full((cut,), true_left, device=device)), dim=1);
-
-        dis_out = netD(gen_out).view(-1)
+        side = random.randint(0, 1)
+        label.fill_(side)
+    
+        if(side):
+            dis_out = netD(data["curr"].to(device), gen_out).view(-1)
+        else:
+            dis_out = netD(gen_out, data["curr"].to(device)).view(-1)
 
         errG = loss(dis_out, label)  ## where loss is applied
 
@@ -130,13 +146,15 @@ for epoch in range(1):
         optimizerG.step()
 
         #### stats
-        if i % 50 == 0:
-            print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD_left: %.4f\tD_right: %.4f\tD_right: %.4f'
+        if i % 20 == 0:
+            print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD_left: %.4f\tD_right: %.4f\tD_gen: %.4f'
                   % (epoch, num_epochs, i, len(dataloader),
                      errD.item(), errG.item(), D_left, D_right, D_gen))
 
         G_losses.append(errG.item())
         D_losses.append(errD.item())
+        torch.cuda.empty_cache()
+print("Done training")
 
 torch.save(netG.state_dict(), "generator.bin")
 torch.save(netD.state_dict(), "discriminator.bin")
