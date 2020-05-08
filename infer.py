@@ -20,8 +20,7 @@ __email__ = "josue.n.rivera@outlook.com"
 #image_size = 500
 nc = 3
 ngf = 64
-batch_size = 4
-num_epochs = 5
+batch_size = 2
 beta1 = 0.5
 ngpu = 1
 lf_to_rg_ratio = 0.5
@@ -38,8 +37,8 @@ dataset = prep.PIFDataset(
 
 dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
-#device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
-device = torch.device("cpu")
+device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
+#device = torch.device("cpu")
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -60,7 +59,6 @@ netG.apply(weights_init)
 batch = next(iter(dataloader))
 out = netG(batch["prev"].to(device), batch["next"].to(device))
 
-plt.figure(figsize=(2,2))
 plt.axis("off")
 plt.title("Previous Training Images")
 
