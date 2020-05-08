@@ -56,7 +56,7 @@ out = netG(samp["prev"].unsqueeze(0).to(device), samp["next"].unsqueeze(0).to(de
 
 img = np.uint8(out.cpu().detach().numpy())[:, ::-1, :, :]
 
-print(img.shape)
+print(img[:, ::-1, :, :].shape)
 
 #img = transforms.ToPILImage()(img)
 
