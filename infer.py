@@ -57,7 +57,7 @@ if (device.type == 'cuda') and (ngpu > 1):
 netG.apply(weights_init)
 
 batch = next(iter(dataloader))
-#out = netG(batch["prev"].to(device), batch["next"].to(device))
+out = netG(batch["prev"].to(device), batch["next"].to(device))
 
 plt.figure(figsize=(2,2))
 plt.axis("off")
@@ -65,7 +65,7 @@ plt.title("Training Images")
 
 plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu(),(1,2,0)))
 
-#img = np.uint8(out.cpu().detach().numpy())[0]
+img = np.uint8(out.cpu().detach().numpy())[0]
 
 #print(img.shape)
 
@@ -73,7 +73,7 @@ plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2,
 
 #print(img.size)
 
-#plt.imshow(np.transpose(img, (1, 2, 0)))
+plt.imshow(np.transpose(utils.make_grid(out.to(device)[:4], padding=2, normalize=True).cpu(),(1,2,0)))
 plt.show()
 
 
