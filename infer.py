@@ -63,7 +63,7 @@ plt.figure(figsize=(2,2))
 plt.axis("off")
 plt.title("Training Images")
 
-plt.imshow(np.transpose(utils.make_grid(batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
+plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu(),(1,2,0)))
 
 #img = np.uint8(out.cpu().detach().numpy())[0]
 
