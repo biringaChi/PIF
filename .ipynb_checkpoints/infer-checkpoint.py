@@ -23,11 +23,12 @@ nc = 3
 ngf = 64
 batch_size = 2
 beta1 = 0.5
-ngpu = 1
+ngpu = torch.cuda.device_count()
 lf_to_rg_ratio = 0.5
 
 diff_pickle = open("planet_earth_diff.pickle","rb")
 
+print("loading dataset")
 dataset = prep.PIFDataset(
     path='data_prepocessing/PlanetEarth',
     diff = pickle.load(diff_pickle),
@@ -37,6 +38,8 @@ dataset = prep.PIFDataset(
         ]))
 
 dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+
+print("Done loading dataset")
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 #device = torch.device("cpu")
@@ -57,8 +60,10 @@ if (device.type == 'cuda') and (ngpu > 1):
 
 netG.apply(weights_init)
 
+print("running model")
 batch = next(iter(dataloader))
 out = netG(batch["prev"].to(device), batch["next"].to(device))
+print("done running model")
 
 #plt.figure(figsize=(2,2))
 #plt.axis("off")
@@ -67,21 +72,24 @@ out = netG(batch["prev"].to(device), batch["next"].to(device))
 print(batch["prev"].size())
 #plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 #plt.show()
-cv2.imwrite('prev.jpg', np.transpose(utils.make_grid(batch["prev"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+img = np.transpose(utils.make_grid(batch["prev"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)).numpy()
+plt.imsave('prev.jpg', img)
 
 #plt.axis("off")
 #plt.title("Next Training Images")
 print(batch["next"].size())
 #plt.imshow(np.transpose(utils.make_grid(batch["next"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 #plt.show()
-cv2.imwrite('next.jpg', np.transpose(utils.make_grid(batch["next"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+img = np.transpose(utils.make_grid(batch["next"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)).numpy()
+plt.imsave('next.jpg', img)
 
 #plt.axis("off")
 #plt.title("Infered Images")
 print(out.size())
 #plt.imshow(np.transpose(utils.make_grid(out.to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 #plt.show()
-cv2.imwrite('infered.jpg', np.transpose(utils.make_grid(out.to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+img = np.transpose(utils.make_grid(out.to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)).numpy()
+plt.imsave('infered.jpg', img)
 
 
 
