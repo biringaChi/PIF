@@ -38,7 +38,8 @@ dataset = prep.PIFDataset(
 
 dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
-device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
+#device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
+device = torch.device("cpu")
 
 def weights_init(m):
     classname = m.__class__.__name__
