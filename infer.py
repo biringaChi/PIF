@@ -62,19 +62,23 @@ out = netG(batch["prev"].to(device), batch["next"].to(device))
 
 plt.figure(figsize=(2,2))
 plt.axis("off")
-plt.title("Training Images")
+plt.title("Previous Training Images")
 
-plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu(),(1,2,0)))
+plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+plt.show()
 
-img = np.uint8(out.cpu().detach().numpy())[0]
+plt.title("Next Training Images")
+plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+plt.show()
+#img = np.uint8(out.cpu().detach().numpy())[0]
 
 #print(img.shape)
 
 #img = transforms.ToPILImage()(img)
 
 #print(img.size)
-
-plt.imshow(np.transpose(utils.make_grid(out.to(device)[:4], padding=2, normalize=True).cpu(),(1,2,0)))
+plt.title("Infered Images")
+plt.imshow(np.transpose(utils.make_grid(out.to(device)[:4], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 plt.show()
 
 
