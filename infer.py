@@ -9,6 +9,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from generator import Generator
 from discriminator import Discriminator
+from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 
 __author__ = 'JosueCom'
