@@ -64,21 +64,20 @@ plt.figure(figsize=(2,2))
 plt.axis("off")
 plt.title("Previous Training Images")
 
-plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+print(batch["prev"].size())
+plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 plt.show()
 
+plt.axis("off")
 plt.title("Next Training Images")
-plt.imshow(np.transpose(utils.make_grid(batch["prev"].to(device)[:4], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+print(batch["next"].size())
+plt.imshow(np.transpose(utils.make_grid(batch["next"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 plt.show()
-#img = np.uint8(out.cpu().detach().numpy())[0]
 
-#print(img.shape)
-
-#img = transforms.ToPILImage()(img)
-
-#print(img.size)
+plt.axis("off")
 plt.title("Infered Images")
-plt.imshow(np.transpose(utils.make_grid(out.to(device)[:4], padding=2, normalize=True).cpu().detach(),(1,2,0)))
+print(out.size())
+plt.imshow(np.transpose(utils.make_grid(out.to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)))
 plt.show()
 
 
