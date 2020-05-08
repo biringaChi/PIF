@@ -26,7 +26,7 @@ nc = 3
 nz = 100
 ngf = 25
 ndf = 25
-num_epochs = 1
+num_epochs = 5
 lr = 0.0002
 beta1 = 0.5
 ngpu = torch.cuda.device_count()
@@ -156,15 +156,15 @@ for epoch in range(num_epochs):
         torch.cuda.empty_cache()
 print("Done training")
 
-torch.save(netG.state_dict(), "generator.bin")
-torch.save(netD.state_dict(), "discriminator.bin")
+torch.save(netG, "generator2.bin")
+torch.save(netD, "discriminator2.bin")
 
 # store network stats for testing
-G = open("G_losses.pickle","wb")
+G = open("G_losses2.pickle","wb")
 pickle.dump(G_losses, G)
 G.close()
 
-D = open("D_losses.pickle","wb")
+D = open("D_losses2.pickle","wb")
 pickle.dump(D_losses, D)
 D.close()
 

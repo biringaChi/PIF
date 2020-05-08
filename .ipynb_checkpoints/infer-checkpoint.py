@@ -21,7 +21,7 @@ __email__ = "josue.n.rivera@outlook.com"
 #image_size = 500
 nc = 3
 ngf = 25
-batch_size = 2
+batch_size = 4
 image_size = 500
 beta1 = 0.5
 ngpu = torch.cuda.device_count()
@@ -61,7 +61,8 @@ netG = Generator(ngpu, nc, ngf).to(device)
 """if (device.type == 'cuda') and (ngpu > 1):
     netG = nn.DataParallel(netG, list(range(ngpu)))"""
 
-netG.apply(weights_init)
+#netG.apply(weights_init)
+netG.load_state_dict(torch.load("generator.bin"))
 
 print("running model")
 batch = next(iter(dataloader))
