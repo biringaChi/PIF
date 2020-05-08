@@ -3,9 +3,10 @@ import torch
 import torch.nn as nn
 import pickle
 import data_prep as prep
-from torchvision import transforms
+from torchvision import transforms, utils
 import torch.nn.parallel
 import numpy as np
+from torch.utils.data import DataLoader
 from generator import Generator
 from discriminator import Discriminator
 import matplotlib.pyplot as plt
@@ -61,7 +62,7 @@ plt.figure(figsize=(2,2))
 plt.axis("off")
 plt.title("Training Images")
 
-plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
+plt.imshow(np.transpose(utils.make_grid(batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
 
 #img = np.uint8(out.cpu().detach().numpy())[0]
 
