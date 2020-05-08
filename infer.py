@@ -52,10 +52,18 @@ if (device.type == 'cuda') and (ngpu > 1):
 netG.apply(weights_init)
 
 samp = dataset[0]
-out = netG(samp["prev"], samp["next"])
+out = netG(samp["prev"].unsqueeze(0).to(device), samp["next"].unsqueeze(0).to(device))
 
-plt.imshow(out.numpy())
+img = np.uint8(out.cpu().detach().numpy())[:, ::-1, :, :]
 
+print(img.shape)
+
+#img = transforms.ToPILImage()(img)
+
+#print(img.size)
+
+plt.imshow(img)
+plt.show()
 
 
 
