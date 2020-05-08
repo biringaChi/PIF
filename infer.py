@@ -18,6 +18,7 @@ __email__ = "josue.n.rivera@outlook.com"
 #image_size = 500
 nc = 3
 ngf = 64
+batch_size = 4
 num_epochs = 5
 beta1 = 0.5
 ngpu = 1
@@ -32,6 +33,8 @@ dataset = prep.PIFDataset(
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ]))
+
+dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
 device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
 
@@ -51,18 +54,24 @@ if (device.type == 'cuda') and (ngpu > 1):
 
 netG.apply(weights_init)
 
-samp = dataset[0]
-out = netG(samp["prev"].unsqueeze(0).to(device), samp["next"].unsqueeze(0).to(device))
+batch = next(iter(dataloader))
+#out = netG(batch["prev"].to(device), batch["next"].to(device))
 
-img = np.uint8(out.cpu().detach().numpy())[:, ::-1, :, :]
+plt.figure(figsize=(2,2))
+plt.axis("off")
+plt.title("Training Images")
 
-print(img[:, ::-1, :, :].shape)
+plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=2, normalize=True).cpu(),(1,2,0)))
+
+#img = np.uint8(out.cpu().detach().numpy())[0]
+
+#print(img.shape)
 
 #img = transforms.ToPILImage()(img)
 
 #print(img.size)
 
-plt.imshow(img)
+#plt.imshow(np.transpose(img, (1, 2, 0)))
 plt.show()
 
 
