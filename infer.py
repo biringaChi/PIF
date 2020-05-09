@@ -62,7 +62,8 @@ def weights_init(m):
     netG = nn.DataParallel(netG, list(range(ngpu)))"""
 
 #netG.apply(weights_init)
-netG = torch.load("generator3.bin")
+netG = torch.load("nice/generator5.bin")
+netG.eval()
 
 print("running model")
 batch = next(iter(dataloader))
@@ -79,7 +80,7 @@ print(batch["prev"].size())
 #plt.show()
 #img = np.transpose(utils.make_grid(batch["prev"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)).numpy()
 #plt.imsave('prev.jpg', img)
-utils.save_image(batch["prev"][0], 'cool/img1.png', normalize=True)
+utils.save_image(batch["prev"][0], 'cool/img1.png', normalize=True, padding=0)
 
 #plt.axis("off")
 #plt.title("Next Training Images")
@@ -88,7 +89,7 @@ print(batch["next"].size())
 #plt.show()
 #img = np.transpose(utils.make_grid(batch["next"].to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)).numpy()
 #plt.imsave('next.jpg', img)
-utils.save_image(batch["next"][0], 'cool/img3.png', normalize=True)
+utils.save_image(batch["next"][0], 'cool/img3.png', normalize=True, padding=0)
 
 #plt.axis("off")
 #plt.title("Infered Images")
@@ -97,6 +98,6 @@ print(out.size())
 #plt.show()
 #img = np.transpose(utils.make_grid(out.to(device)[:batch_size], padding=2, normalize=True).cpu().detach(),(1,2,0)).numpy()
 #plt.imsave('infered.jpg', img)
-utils.save_image(out[0], 'cool/img2.png', normalize=True)
+utils.save_image(out[0], 'cool/img2.png', normalize=True, padding=0)
 
 
