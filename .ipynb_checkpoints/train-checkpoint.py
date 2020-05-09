@@ -73,31 +73,33 @@ netG = Generator(ngpu, nc, ngf).to(device)
 netG.apply(weights_init)
 print("Done loading generator")
 
-print("> loading discriminator")
+"""print("> loading discriminator")
 ## discriminator
 netD = Discriminator(ngpu, nc, ndf).to(device)
 
-"""if (device.type == 'cuda') and (ngpu > 1):
-    netD = nn.DataParallel(netD, list(range(ngpu)))"""
+if (device.type == 'cuda') and (ngpu > 1):
+    netD = nn.DataParallel(netD, list(range(ngpu)))
 
 netD.apply(weights_init)
-print("Done loading discriminator")
+print("Done loading discriminator")"""
 
 # which of the two input is the real one for the discriminator
 true_left = 0
 true_right = 1
 
-optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
+#optimizerD = optim.Adam(netD.parameters(), lr=lr, betas=(beta1, 0.999))
 optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 
 
-loss = nn.BCELoss()
+#loss = nn.BCELoss()
+loss = nn.MSELoss()
 print("> training")
 torch.cuda.empty_cache()
+len_dt = len(dataloader)
 for epoch in range(num_epochs):
 
     for i, data in enumerate(dataloader, 0):
-
+        """
         netD.zero_grad()
         b_size = data["prev"].size(0)
         cur = data["curr"].to(device)
@@ -155,9 +157,26 @@ for epoch in range(num_epochs):
         G_losses.append(errG.item())
         D_losses.append(errD.item())
         torch.cuda.empty_cache()
+        """
+        netG.zero_grad()
+        gen_out = netG(data["prev"].to(device), data["next"].to(device))
+        torch.cuda.empty_cache()
+        
+        errG = loss(gen_out, data["curr"].to(device))
+        errG.backward()
+        D_gen = gen_out.mean().item()
+        
+        optimizerG.step()
+        
+        G_losses.append(errG.item())
+        
+        if i % 20 == 0:
+            print('[%d/%d][%d/%d]\tLoss_G: %.4f\tD_gen: %.4f'
+                  % (epoch, num_epochs, i, len_dt, errG.item(), D_gen))
+        
     
-    torch.save(netG, "nice/generator4.bin")
-    torch.save(netD, "nice/discriminator4.bin")
+    torch.save(netG, "nice/generator6.bin")
+    #torch.save(netD, "nice/discriminator4.bin")
     
 print("Done training")
 
@@ -165,11 +184,11 @@ print("Done training")
 #torch.save(netD, "nice/discriminator5.bin")
 
 # store network stats for testing
-G = open("nice/G_losses4.pickle","wb")
+G = open("nice/G_losses6.pickle","wb")
 pickle.dump(G_losses, G)
 G.close()
 
-D = open("nice/D_losses4.pickle","wb")
-pickle.dump(D_losses, D)
-D.close()
+#D = open("nice/D_losses4.pickle","wb")
+#pickle.dump(D_losses, D)
+#D.close()
 
