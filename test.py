@@ -1,55 +1,32 @@
 __author__ = 'biringaChi'
 __email__ = "biringachidera@gmail.com"
 
-import torch
-import data_prep as prep
-import numpy as np
-import torchvision.utils as vutils
+from matplotlib import pyplot as plt
+import pickle
 
-diff_pickle = open("diff.pickle","rb")
-G_losses = open("G_losses.pickle","rb")
-D_losses = open("D_losses.pickle","rb")
+G_losses6 = open("G_losses6.pickle","rb")
+G_losses6 = pickle.load(G_losses6)
 
-dataset = PIFDataset(root_directory=dataroot,
-        diff = pickle.load(diff_pickle),
-        transform=transforms.Compose([
-            prep.Rescale(image_size),
-            prep.ToTensor()
-            ]))
-
-dataloader = DataLoader(dataset, batch_size=batch_size,
-        shuffle=True)
-
-device = torch.device("cuda")
-checkpoint = torch.load(PATH, map_location=str(device))
-model.load_state_dict(checkpoint, strict=False)
-model.to(device)
-model.float()
-model.eval()
+G_losses6_2 = open("G_losses6_2.pickle","rb")
+G_losses6_2 = pickle.load(G_losses6_2)
 
 
-def network_losses(G_losses, D_losses):
+combined = []
+
+for loss in G_losses6:
+    combined.append(loss)
+
+for loss_2 in G_losses6_2:
+    combined.append(loss_2)
+
+
+def network_losses(combined):
     plt.figure(figsize=(10,5))
-    plt.title("Generator vs Discriminator Loss During Training")
-    plt.plot(G_losses, label="G")
-    plt.plot(D_losses, label="D")
+    plt.title("Loss Rate")
+    plt.plot(combined)
     plt.xlabel("iterations")
     plt.ylabel("Loss")
-    plt.legend()
     plt.show()
 
-G_losses = pickle.load(G_losses)
-D_losses = pickle.load(D_losses)
-network_losses(G_losses, D_losses)
-
-
-def real_images(dataloader):
-    real_batch = next(iter(dataloader))
-    plt.figure(figsize=(15,15))
-    plt.subplot(1,2,1)
-    plt.axis("off")
-    plt.title("Real Images")
-    plt.imshow(np.transpose(vutils.make_grid(real_batch[0].to(device)[:64], padding=5, normalize=True).cpu(),(1,2,0)))
-
-real_images(dataloader)
+network_losses(combined)
 
