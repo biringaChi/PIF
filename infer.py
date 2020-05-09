@@ -62,7 +62,7 @@ def weights_init(m):
     netG = nn.DataParallel(netG, list(range(ngpu)))"""
 
 #netG.apply(weights_init)
-netG = torch.load("nice/generator5.bin")
+netG = torch.load("nice/generator6.bin")
 netG.eval()
 
 print("running model")
