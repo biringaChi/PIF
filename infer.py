@@ -35,7 +35,7 @@ dataset = prep.PIFDataset(
     diff = pickle.load(diff_pickle),
     transform=transforms.Compose([
         transforms.ToPILImage(),
-        transforms.Resize(image_size),
+        #transforms.Resize(image_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ]))
