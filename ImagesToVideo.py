@@ -4,16 +4,16 @@ import numpy as np
 import os
 from os.path import isfile, join
 
-pathIn= './images/testing/'
+pathIn= 'out/'
 pathOut = 'videoRsult.mp4'
 
-fps = 0.5
-frame_array = []
+fps = 50
+"""frame_array = []
 files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]
 
 #for sorting the file names properly
 files.sort(key = lambda x: x[5:-4])
-files.sort()
+files.sort()"""
 frame_array = []
 files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]
 
