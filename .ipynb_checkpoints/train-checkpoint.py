@@ -20,7 +20,7 @@ __email__ = "josue.n.rivera@outlook.com"
 
 dataroot = 'data_prepocessing/PlanetEarth'
 
-batch_size = 4
+batch_size = 10
 image_size = 500
 nc = 3
 nz = 100
@@ -100,6 +100,7 @@ for epoch in range(num_epochs):
 
         netD.zero_grad()
         b_size = data["prev"].size(0)
+        cur = data["curr"].to(device)
 
        	######### train discriminator
         gen_out = netG(data["prev"].to(device), data["next"].to(device))
@@ -107,7 +108,7 @@ for epoch in range(num_epochs):
         
         ## Train with correct output on the left side
         label = torch.full((b_size,), true_left, device=device, dtype=torch.float32)
-        dis_out = netD(data["curr"].to(device), gen_out).view(-1)
+        dis_out = netD(cur, gen_out.detach()).view(-1)
         torch.cuda.empty_cache()
 
         errD_left = loss(dis_out, label)
@@ -116,11 +117,11 @@ for epoch in range(num_epochs):
 
         ## Train with correct output on the right side
         label.fill_(true_right)
-        dis_out = netD(gen_out, data["curr"].to(device)).view(-1)
+        dis_out = netD(gen_out.detach(), cur).view(-1)
         torch.cuda.empty_cache()
 
         errD_right = loss(dis_out, label)
-        errD_right.backward(retain_graph=True)
+        errD_right.backward()
         D_right = dis_out.mean().item()
 
         errD = errD_left + errD_right
@@ -134,9 +135,9 @@ for epoch in range(num_epochs):
         label.fill_(side)
     
         if(side):
-            dis_out = netD(data["curr"].to(device), gen_out).view(-1)
+            dis_out = netD(cur, gen_out).view(-1)
         else:
-            dis_out = netD(gen_out, data["curr"].to(device)).view(-1)
+            dis_out = netD(gen_out, cur).view(-1)
 
         errG = loss(dis_out, label)  ## where loss is applied
 
@@ -156,15 +157,15 @@ for epoch in range(num_epochs):
         torch.cuda.empty_cache()
 print("Done training")
 
-torch.save(netG, "generator2.bin")
-torch.save(netD, "discriminator2.bin")
+torch.save(netG, "nice/generator4.bin")
+torch.save(netD, "nice/discriminator4.bin")
 
 # store network stats for testing
-G = open("G_losses2.pickle","wb")
+G = open("nice/G_losses4.pickle","wb")
 pickle.dump(G_losses, G)
 G.close()
 
-D = open("D_losses2.pickle","wb")
+D = open("nice/D_losses4.pickle","wb")
 pickle.dump(D_losses, D)
 D.close()
 
