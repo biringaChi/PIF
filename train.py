@@ -26,7 +26,7 @@ nc = 3
 nz = 100
 ngf = 25
 ndf = 25
-num_epochs = 3
+num_epochs = 5
 lr = 0.0002
 beta1 = 0.5
 ngpu = torch.cuda.device_count()
@@ -65,12 +65,15 @@ def weights_init(m):
 
 ## generator
 print("> loading generator")
-netG = Generator(ngpu, nc, ngf).to(device)
+"""netG = Generator(ngpu, nc, ngf).to(device)
 
-"""if (device.type == 'cuda') and (ngpu > 1):
-    netG = nn.DataParallel(netG, list(range(ngpu)))"""
+if (device.type == 'cuda') and (ngpu > 1):
+    netG = nn.DataParallel(netG, list(range(ngpu)))
 
-netG.apply(weights_init)
+netG.apply(weights_init)"""
+
+netG = torch.load("nice/generator6.bin")
+
 print("Done loading generator")
 
 """print("> loading discriminator")
@@ -184,7 +187,7 @@ print("Done training")
 #torch.save(netD, "nice/discriminator5.bin")
 
 # store network stats for testing
-G = open("nice/G_losses6.pickle","wb")
+G = open("nice/G_losses6_2.pickle","wb")
 pickle.dump(G_losses, G)
 G.close()
 
