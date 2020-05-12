@@ -11,7 +11,6 @@ PIF-Model is licensed under **Apache Software License, Version 2.0**.
 ## Installation
 ```
 $ git clone https://github.com/biringaChi/PIF-Model
-$ cd PIF-Model/txt
 $ sudo pip3 install -r requirements.txt
 ```
 ## Description
