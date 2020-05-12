@@ -1,14 +1,1 @@
 # Ignore
-* 
-
-# Except
-!.gitignore
-!data_prep
-!inference
-!networks
-!run
-!metrics
-!readme
-!video_prep
-!txt
-!README.md
