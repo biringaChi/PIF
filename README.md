@@ -23,8 +23,6 @@ We trained a GAN neural network framework using youtube footage to predict it’
 	* Convolutional Neural Network Model with multiple input
 	* Images are encoded and decoded
     
-	<p align="center"><img width="70%" src="readme/GANs.png" alt="gan"/></p>
-    
 * Tools / Resources
     * PyTorch was used to build the models
     * Royalty-free videos was collected from Youtube
@@ -69,12 +67,15 @@ Inferred Frames from Model
 Inferred Sequences from new Model
 <p align="center"><img width="100%" src="readme/inferred_s.png" alt="data_sample"/></p>
 
-Inferred Video Sequence
-<video src="readme/inferred_seq.mp4" poster="readme/inferred_seq.png" width="100%" controls preload></video>
-
 ## Performance
 <p align="center"><img width="100%" src="readme/performance.png" alt="data_sample"/></p>
 Video Frames Difference
 
 * The predominant difference between the original video frames and the generated is in the pixel intensity distribution
 * We captured the overall objects and structure of the frames
+
+
+## Final Video Generation
+[Original](https://drive.google.com/open?id=1vD0j2vMI8NM_PnzDDW2X1kG8GnURRdkF)
+
+[Generated](https://drive.google.com/open?id=12yxv1k4MvM0RZCipEKA4kJmOHChg-7AT)
