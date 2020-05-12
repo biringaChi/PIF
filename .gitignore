@@ -1,4 +1,14 @@
-data_prepocessing
-out
-videoRsult.mp4
-videoRsult2.mp4
+# Ignore
+* 
+
+# Except
+!.gitignore
+!data_prep
+!inference
+!networks
+!run
+!metrics
+!readme
+!video_prep
+!txt
+!README.md

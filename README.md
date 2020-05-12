@@ -11,7 +11,7 @@ PIF-Model is licensed under **Apache Software License, Version 2.0**.
 ## Installation
 ```
 $ git clone https://github.com/biringaChi/PIF-Model
-$ cd PIF-Model/
+$ cd PIF-Model/txt
 $ sudo pip3 install -r requirements.txt
 ```
 ## Description
@@ -43,6 +43,7 @@ We trained a GAN neural network framework using youtube footage to predict it’
     
 ## Run Sample
 ```
+$ cd data_prep/
 $ python3 data_sample.py
 ```
 <p align="center"><img width="100%" src="readme/sd1.png" alt="data_sample"/></p>
@@ -56,6 +57,7 @@ $ python3 data_sample.py
 Run Model
 
 ```
+$ cd inference/
 $ python3 infer.py
 ```
 <p align="center"><img width="100%" src="readme/inferred.png" alt="data_sample"/></p> 
@@ -77,7 +79,3 @@ Video Frames Difference
 
 * The predominant difference between the original video frames and the generated is in the pixel intensity distribution
 * We captured the overall objects and structure of the frames
-
-
-
-
